@@ -8,14 +8,18 @@
 
 
 #define DEFAULT_PORT 27015
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 256
 
 #include <winsock2.h>
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+
 
 #pragma comment(lib, "Ws2_32.lib")
 using namespace std;
+
+
 
 int main(int argc, char *argv[]) {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -72,15 +76,24 @@ int main(int argc, char *argv[]) {
 
 	char sendbuf[DEFAULT_BUFLEN];
 	char recvbuf[DEFAULT_BUFLEN];
+	cout << "Enter file name:" << endl;
 
-	do
-	{
-		cout << "Enter message:" << endl;
+	cin >> sendbuf;
 
-		cin >> sendbuf;
+	bool done = false;
+
+	if (strcmp(sendbuf, "exit"))
+		done = true;
+	while (!done);
+	{	
+		ifstream fin;
+		
+		fin.open(sendbuf, ios::binary |ios::ate);
+
+		long filesize = fin.tellg();
 
 		// Send an initial buffer
-		iResult = send(s, sendbuf, (int)strlen(sendbuf)+1, 0);
+		iResult = send(s, (char*)&filesize, sizeof(long), 0);// (int)strlen(sendbuf) + 1, 0);
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
 			closesocket(s);
@@ -88,10 +101,15 @@ int main(int argc, char *argv[]) {
 			return 1;
 		}
 
-		printf("Bytes Sent: %ld\n", iResult);
+		printf("Bytes Sent: %ld\n\n", iResult);
+		cout << "Enter file name:" << endl;
 
+		cin >> sendbuf;
 
-	} while (strcmp(sendbuf, "exit"));
+		if (strcmp(sendbuf, "exit"))
+			done = true;
+
+	}
 
 
 	// shutdown the connection for sending since no more data will be sent

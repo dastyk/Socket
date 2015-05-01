@@ -8,7 +8,7 @@
 
 
 #define DEFAULT_PORT "27015"
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 256
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -107,7 +107,10 @@ int main(int argc, char *argv[]) {
 
 			if (iResult > 0) {
 
-				cout << recvbuf << endl;
+				long test = 0;
+				memcpy(&test, recvbuf, iResult);
+				test /= 1024;
+				printf("As int: %ld", test);
 				if (!strcmp(recvbuf, "shutdown"))
 					shutdown = true;
 
