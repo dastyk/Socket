@@ -7,6 +7,9 @@
 #include <iostream>
 #include "FileLoader.h"
 
+
+#define RERROR(e) if(e != 0) e;
+
 class TCPSock
 {
 public:
@@ -22,7 +25,15 @@ public:
 
 	void Destroy();
 
+	int RecvData(char* dataBuf, ULONG dataBufLen);
+
+
+	int SendData(char* data, ULONG dataLen);
 	int SendPackage(Package* pack);
+
+	int SendWaitForAck(char* data, ULONG dataLen);
+
+	int SendFile(char* path);
 
 	int ShutDown();
 

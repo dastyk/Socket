@@ -64,32 +64,80 @@ int TCPSock::Connect(UINT destPort, char* destAdress)
 	return 0;
 }
 
+int TCPSock::SendData(char* data, ULONG dataLen)
+{
+	// Send data
+	int iResult = send(mSocket, data, dataLen, 0);
+	if (iResult == SOCKET_ERROR) {
+		printf("send failed: %d\n", WSAGetLastError());
+		return iResult;
+	}
+	return 0;
+}
 
 int TCPSock::SendPackage(Package* pack)
 {
-	// Send file name.
-	int iResult = send(mSocket, (char*)pack->name.c_str(), pack->name.size() + 1, 0);
-	if (iResult == SOCKET_ERROR) {
-		printf("send failed: %d\n", WSAGetLastError());
-		return iResult;
-	}
+	int iResult;
 
-	// Send package data size
-	iResult = send(mSocket, (char*)(&pack->size), sizeof(pack->size), 0);
-	if (iResult == SOCKET_ERROR) {
-		printf("send failed: %d\n", WSAGetLastError());
-		return iResult;
-	}
+	// Send file name, and wait for ack.
+	iResult = SendWaitForAck((char*)pack->name.c_str(), pack->name.size() + 1);
+	RERROR(iResult);
 
-	// Send package data
-	iResult = send(mSocket, pack->data, pack->size, 0);
-	if (iResult == SOCKET_ERROR) {
-		printf("send failed: %d\n", WSAGetLastError());
-		return iResult;
-	}
-	return iResult;
+	// Send package data size, and wait for ack.
+	iResult = SendWaitForAck((char*)(&pack->size), sizeof(pack->size));
+	RERROR(iResult);
+
+	// Send package data, and wait for ack.
+	iResult = SendWaitForAck(pack->data, pack->size);
+	RERROR(iResult);
+
+	return 0;
 }
 
+
+int TCPSock::RecvData(char* dataBuf, ULONG dataBufLen)
+{
+	int iResult = recv(mSocket, dataBuf, dataBufLen, 0);
+	if (iResult == SOCKET_ERROR) {
+		printf("Recv failed: %d\n", WSAGetLastError());
+		return iResult;
+	}
+
+	return 0;
+}
+
+int TCPSock::SendWaitForAck(char* data, ULONG dataLen)
+{
+	bool ack = false;
+	int iResult;
+	while (!ack)
+	{
+		iResult = SendData(data, dataLen);
+		RERROR(iResult);
+
+		iResult = RecvData((char*)&ack, sizeof(bool));
+		RERROR(iResult);
+	}
+
+	return 0;
+}
+
+int TCPSock::SendFile(char* path)
+{
+	FileLoader f;
+	Package pack;
+	int iResult;
+
+	// Load file
+	iResult = f.LoadFile(path, &pack);
+	RERROR(iResult);
+
+	// Send file
+	iResult = SendPackage(&pack);
+	RERROR(iResult);
+
+	return 0;
+}
 
 int TCPSock::ShutDown()
 {

@@ -8,6 +8,8 @@
 #pragma comment(lib, "Ws2_32.lib")
 #include "FileLoader.h"
 
+#define RERROR(e) if(e != 0) e;
+
 class TCPSock
 {
 public:
@@ -23,11 +25,15 @@ public:
 
 	int Accept();
 
-	int recvData(char* dataBuf, ULONG dataBufLen);
+	int SendData(char* data, ULONG dataLen);
 
-	int recvPack(Package* pack);
+	int RecvData(char* dataBuf, ULONG dataBufLen);
 
+	int RecvPack(Package* pack);
 
+	int RecvSendAck(char* data, ULONG dataLen);
+
+	int RecvFile();
 
 private:
 	SOCKET mSocket;

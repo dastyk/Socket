@@ -13,17 +13,7 @@ int main()
 
 	char buf[500];
 
-//	cout << "Bytes recived: " << sock.recvData(buf, 500) << endl;
-	
-	Package pack;
-
-	cout << sock.recvPack(&pack);
-	
-	FileLoader f;
-
-	f.CreateFileFromPackage(&pack);
-	cout << buf << endl;
-
+	sock.RecvFile();
 
 	cin >> buf;
 

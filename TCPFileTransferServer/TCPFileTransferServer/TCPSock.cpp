@@ -95,25 +95,75 @@ int TCPSock::Accept()
 	return 0;
 }
 
-int TCPSock::recvData(char* dataBuf, ULONG dataBufLen)
+int TCPSock::RecvData(char* dataBuf, ULONG dataBufLen)
 {
 	int iResult = recv(mCSocket, dataBuf, dataBufLen, 0);
 
 	return iResult;
 }
 
-int TCPSock::recvPack(Package* pack)
+int TCPSock::RecvPack(Package* pack)
 {
+	int iResult;
 	char buf[500];
-	int iResult = recv(mCSocket, buf, 500, 0);
+
+	// Recv file name, and send ack.
+	iResult = RecvSendAck(buf, 500);
+	RERROR(iResult);
 	pack->name = buf;
 
+	// Recv package data size, and send ack.
+	iResult = RecvSendAck((char*)&pack->size, sizeof(pack->size));
+	RERROR(iResult);
 
-	iResult = recv(mCSocket, (char*)&pack->size, sizeof(pack->size), 0);
+	// Recv package data, and send ack.
 	pack->data = new char[pack->size];
-	iResult = recv(mCSocket, pack->data, pack->size, 0);
+	iResult = RecvSendAck((char*)pack->data, pack->size);
+	RERROR(iResult);
 
-	return iResult;
+	return 0;
+}
+
+int TCPSock::RecvSendAck(char* data, ULONG dataLen)
+{
+	bool ack = true;
+	int iResult;
+
+	iResult = RecvData(data, dataLen);
+	RERROR(iResult);
+	iResult = SendData((char*)&ack, sizeof(bool));
+	RERROR(iResult);
+
+	return 0;
+}
+
+
+int TCPSock::SendData(char* data, ULONG dataLen)
+{
+	// Send data
+	int iResult = send(mCSocket, data, dataLen, 0);
+	if (iResult == SOCKET_ERROR) {
+		printf("send failed: %d\n", WSAGetLastError());
+		return iResult;
+	}
+	return 0;
+}
+
+int TCPSock::RecvFile()
+{
+	FileLoader f;
+	Package pack;
+	int iResult;
+
+	// Recieve file
+	iResult = RecvPack(&pack);
+	RERROR(iResult);
+
+	// Create file
+	iResult = f.CreateFileFromPackage(&pack);
+	RERROR(iResult);
+
+	return 0;
 }
 
 void TCPSock::Destroy()

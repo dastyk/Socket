@@ -19,18 +19,46 @@ int UDPSockListener::Init()
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		WSACleanup();
-		return -1;
+		return iResult;
 	}
 
+
+	return 0;
+}
+
+int UDPSockListener::CreateSock()
+{
 
 	// Create the socket.
 	mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (mSocket == INVALID_SOCKET)
 	{
-		return -2;
+		return WSAGetLastError();
 	}
 
 	return 0;
+}
+
+
+void UDPSockListener::Timeout()
+{
+
+	timeval tv;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+
+	// Set Timeout for recv call
+	setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&tv), sizeof(timeval));
+}
+
+void UDPSockListener::NoTimeout()
+{
+	timeval tv;
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+
+	// Set Timeout for recv call
+	setsockopt(mSocket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&tv), sizeof(timeval));
 }
 
 int UDPSockListener::Bind(UINT listenPort)
@@ -62,7 +90,7 @@ int UDPSockListener::StartListen(char* dataBuf, UINT dataBufLen)
 
 	iResult = recvfrom(mSocket, dataBuf, dataBufLen, 0, (struct sockaddr*)&sourceAddr, &sLen);
 
-	return iResult;
+	return 0;
 }
 
 void UDPSockListener::Destroy()

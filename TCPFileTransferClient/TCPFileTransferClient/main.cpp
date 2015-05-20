@@ -13,17 +13,10 @@ int main()
 
 	cout << sock.Connect(27015, "127.0.0.1") << endl;
 
-	char msg[] = { "Message" };
+	char msg[500];
 
 
-	FileLoader f;
-	Package pack;
-	if (f.LoadFile("file.txt", &pack) >= 0)
-	{
-
-	}
-
-	cout << sock.SendPackage(&pack) << endl;
+	sock.SendFile("ShaderClass.h");
 
 	cin >> msg;
 

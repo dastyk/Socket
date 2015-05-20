@@ -1,26 +1,23 @@
-#include "UDPSockListener.h"
-
+#include "UDPFileTransferClass.h"
 #include <iostream>
 
 using namespace std;
 
-#define BUFLEN (200*1024)
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 
 int main()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	int r;
-	UDPSockListener sock;
-	sock.Init();
+	
+	UDPFileTransferClass ft;
 
-	char buf[BUFLEN];
+	cout << ft.Init(27016, "127.0.0.1", 27015) << endl;
 
-	cout << sock.Bind(27015);
-
-
-	cout << sock.StartListen(buf, BUFLEN) << endl;
-	cout << buf;
-
-	sock.Destroy();
+	cout << ft.RecvFile() << endl;
 
 	cin >> r;
 

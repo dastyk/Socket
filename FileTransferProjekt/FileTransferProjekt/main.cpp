@@ -1,23 +1,22 @@
-#include "UDPSock.h"
-#include <iostream>
+#include "UDPFileTransferClass.h"
 
-using namespace std;
+
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 int main()
 {
-	int r;
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	int iResult;
+	
+	UDPFileTransferClass ft;
 
-	UDPSock sock;
-	cout << sock.Init();
+	iResult = ft.Init(27015, "127.0.0.1", 27016);
 
-	char* msg = { "hello there.\n" };
+	iResult = ft.SendFile("film.mp4");
 
-
-	cout << sock.SendPackage(27015, "127.0.0.1", msg, strlen(msg) + 1);
-
-	sock.Destroy();
-
-	cin >> r;
+	cin >> iResult;
 
 	return 0;
 }

@@ -5,9 +5,7 @@
 #include <winsock2.h>
 #include <iostream>
 #pragma comment(lib, "Ws2_32.lib")
-#include <iostream>
 
-using namespace std;
 #define RERROR(e) if(e != 0) e;
 
 class UDPSock

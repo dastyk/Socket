@@ -64,11 +64,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FileLoader.h" />
+    <ClInclude Include="UDPFileTransferClass.h" />
     <ClInclude Include="UDPSock.h" />
+    <ClInclude Include="UDPSockListener.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UDPFileTransferClass.cpp" />
     <ClCompile Include="UDPSock.cpp" />
+    <ClCompile Include="UDPSockListener.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

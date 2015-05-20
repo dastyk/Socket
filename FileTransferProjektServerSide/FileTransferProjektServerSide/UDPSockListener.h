@@ -12,11 +12,16 @@ public:
 	~UDPSockListener();
 
 	int Init();
+	int CreateSock();
+
 	void Destroy();
 
 	int Bind(UINT listenPort);
 
 	int StartListen(char* dataBuf, UINT dataBufLen);
+
+	void Timeout();
+	void NoTimeout();
 
 private:
 	SOCKET mSocket;
